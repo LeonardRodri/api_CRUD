@@ -25,9 +25,23 @@ app.get('/usuarios', (req, res) => {
     return res.send(JSON.stringify(usuarios))
 })
 
-app.post('/usuarios', (req, res) => {
-  let { usuario4 } = req.body;
-  res.send(`Usuario ${usuario4} foi cadastro`)
+app.post('/usuarios', (request, response) => {
+  let body = '';
+
+  request.on('data', (chunk) => {
+    body += chunk
+  });
+
+  request.on('end', () => {
+    body = JSON.parse(body)
+    const lastUser = usuarios[usuarios.length - 1].id
+    const newUser = {
+    id: lastUser + 1,
+    name: body.name,
+  }
+  usuarios.push(newUser)
+  response.send(200, newUser)
+  })
 })
 
 app.listen(3000, ()=> {
